@@ -65,14 +65,27 @@ namespace Sokoban
                     continue;
                 }
 
-                if (input[0] == 'u' && sokoban.CanUndo)
+                var command = input[0];
+
+                if (command == 'u' && sokoban.CanUndo)
                 {
                     sokoban.Undo();
                     countMove--;
                     continue;
                 }
 
-                if (sokoban.TryMove(input[0]))
+                if (command == '@')
+                {
+                    while (sokoban.CanUndo)
+                    {
+                        sokoban.Undo();
+                    }
+
+                    countMove = 0;
+                    continue;
+                }
+
+                if (sokoban.TryMove(command))
                 {
                     countMove++;
                 }
