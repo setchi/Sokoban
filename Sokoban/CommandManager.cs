@@ -8,9 +8,20 @@ namespace Sokoban
         Stack<Command> _undoStack = new Stack<Command>();
         Stack<Command> _redoStack = new Stack<Command>();
 
+        /// <summary>
+        /// Undo 可能な状態かどうかを示します
+        /// </summary>
         public bool CanUndo => _undoStack.Count > 0;
+
+        /// <summary>
+        /// Redo 可能な状態かどうかを示します
+        /// </summary>
         public bool CanRedo => _redoStack.Count > 0;
 
+        /// <summary>
+        /// コマンドを実行します
+        /// </summary>
+        /// <param name="command"></param>
         public void Do(Command command)
         {
             command.Do();
@@ -18,12 +29,18 @@ namespace Sokoban
             _redoStack.Clear();
         }
 
+        /// <summary>
+        /// 履歴をクリアします
+        /// </summary>
         public void Clear()
         {
             _undoStack.Clear();
             _redoStack.Clear();
         }
 
+        /// <summary>
+        /// Undo を実行します
+        /// </summary>
         public void Undo()
         {
             if (!CanUndo)
@@ -34,6 +51,9 @@ namespace Sokoban
             _redoStack.Push(command);
         }
 
+        /// <summary>
+        /// Redo を実行します
+        /// </summary>
         public void Redo()
         {
             if (!CanRedo)

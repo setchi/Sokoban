@@ -16,27 +16,53 @@ namespace Sokoban
             { 'd', new Size(1, 0) },
         };
 
+        /// <summary>
+        /// Undo 可能な状態かどうかを示します
+        /// </summary>
         public bool CanUndo => _commandManager.CanUndo;
+
+        /// <summary>
+        /// Redo 可能な状態かどうかを示します
+        /// </summary>
         public bool CanRedo => _commandManager.CanRedo;
+
+        /// <summary>
+        /// クリア状態かどうかを示します
+        /// </summary>
         public bool IsClear => _map.GoalPositions
             .Select(_map.GetField)
             .All(type => type == FieldTypes.Block);
 
+        /// <summary>
+        /// コンストラクタ
+        /// </summary>
+        /// <param name="map"></param>
         public Sokoban(Map map)
         {
             _map = map;
         }
 
+        /// <summary>
+        /// 操作を Undo します
+        /// </summary>
         public void Undo()
         {
             _commandManager.Undo();
         }
 
+        /// <summary>
+        /// Undo を取り消します
+        /// </summary>
         public void Redo()
         {
             _commandManager.Redo();
         }
 
+        /// <summary>
+        /// フィールド内の移動を試みます
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns>移動に成功したら true</returns>
         public bool TryMove(char command)
         {
             if (!_directionTable.ContainsKey(command))
