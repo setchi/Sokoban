@@ -61,7 +61,8 @@ namespace Sokoban
                 playerIndex % fieldSize.Width,
                 playerIndex / fieldSize.Width);
 
-            // フィールド内のプレイヤー地点とゴール地点をスペースに置き換えます
+            // フィールドを表すリストでは移動の障害となり得るものだけ管理します
+            // そのためプレイヤー地点とゴール地点はスペースに置き換えます
             foreach (var pos in goalPositions.Concat(new[] { playerPosition }))
             {
                 field[pos.Y * fieldSize.Width + pos.X] = FieldTypes.Space;
