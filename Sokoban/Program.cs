@@ -41,10 +41,16 @@ namespace Sokoban
             var sokoban = new Sokoban(map);
             var countMove = 0;
 
+            Console.WriteLine("倉庫番");
+            Console.WriteLine("Please Enter Key... Game Start");
+            Console.ReadLine();
+
             while (!sokoban.IsClear)
             {
                 Console.WriteLine(mapSerializer.Serialize(map, charTable));
                 Console.WriteLine("移動回数: " + countMove);
+                Console.WriteLine("移動: (上->w, 左->a, 下->s, 右->d) + Enter");
+                Console.WriteLine("戻す->u, リセット->@, 入力キャンセル->!を含める");
 
                 var input = Console.ReadLine();
 
@@ -53,7 +59,7 @@ namespace Sokoban
                     continue;
                 }
 
-                if (input.IndexOf('!') > -1)
+                if (input.Contains('!'))
                 {
                     // Cancel
                     continue;
