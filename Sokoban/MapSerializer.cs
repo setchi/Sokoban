@@ -7,7 +7,16 @@ namespace Sokoban
 {
     class MapSerializer
     {
-        public Map Deserialize(string fieldString, IDictionary<char, FieldTypes> fieldTable)
+        readonly IDictionary<FieldTypes, char> _charTable;
+        readonly IDictionary<char, FieldTypes> _fieldTable;
+
+        public MapSerializer(IDictionary<FieldTypes, char> charTable)
+        {
+            _charTable = charTable;
+            _fieldTable = charTable.ToDictionary(kv => kv.Value, kv => kv.Key);
+        }
+
+        public Map Deserialize(string fieldString)
         {
             var fieldRows = fieldString
                 .Split(Environment.NewLine.ToCharArray())
@@ -19,7 +28,7 @@ namespace Sokoban
 
             var field = fieldRows
                 .SelectMany(row => row)
-                .Select(c => fieldTable[c])
+                .Select(c => _fieldTable[c])
                 .ToList();
 
             var goalPositions = new HashSet<Point>(field
@@ -42,11 +51,11 @@ namespace Sokoban
             return new Map(field, fieldSize, playerPosition, goalPositions);
         }
 
-        public string Serialize(Map map, IDictionary<FieldTypes, char> charTable)
+        public string Serialize(Map map)
         {
             return new string(Enumerable.Range(0, map.FieldSize.Height)
                 .SelectMany(y => Enumerable.Range(0, map.FieldSize.Width)
-                    .Select(x => charTable[GetViewFieldType(map, new Point(x, y))])
+                    .Select(x => _charTable[GetViewFieldType(map, new Point(x, y))])
                     .Concat(Environment.NewLine.ToCharArray()))
                 .ToArray());
         }

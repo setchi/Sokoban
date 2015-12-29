@@ -20,7 +20,7 @@ namespace Sokoban
 #########
 ";
 
-            var charTable = new Dictionary<FieldTypes, char>
+            var mapSerializer = new MapSerializer(new Dictionary<FieldTypes, char>
             {
                 { FieldTypes.Space, ' ' },
                 { FieldTypes.Wall, '#' },
@@ -29,15 +29,9 @@ namespace Sokoban
                 { FieldTypes.Goal, '.' },
                 { FieldTypes.BlockOnGoal, 'O' },
                 { FieldTypes.PlayerOnGoal, 'P' },
-            };
+            });
 
-            var mapSerializer = new MapSerializer();
-            var map = mapSerializer.Deserialize(
-                fieldString,
-                charTable.ToDictionary(
-                    kv => kv.Value,
-                    kv => kv.Key));
-
+            var map = mapSerializer.Deserialize(fieldString);
             var sokoban = new Sokoban(map);
             var countMove = 0;
 
@@ -47,7 +41,7 @@ namespace Sokoban
 
             while (!sokoban.IsClear)
             {
-                Console.WriteLine(mapSerializer.Serialize(map, charTable));
+                Console.WriteLine(mapSerializer.Serialize(map));
                 Console.WriteLine("移動回数: " + countMove);
                 Console.WriteLine("移動: (上->w, 左->a, 下->s, 右->d) + Enter");
                 Console.WriteLine("戻る->u, 進む->r, リセット->@, 入力キャンセル->!を含める");
@@ -98,7 +92,7 @@ namespace Sokoban
                 }
             }
 
-            Console.WriteLine(mapSerializer.Serialize(map, charTable));
+            Console.WriteLine(mapSerializer.Serialize(map));
             Console.WriteLine("移動回数: " + countMove);
             Console.WriteLine("ゲームクリア！おめでとう！！");
         }
