@@ -6,15 +6,21 @@ namespace Sokoban
 {
     class Sokoban
     {
-        readonly Map _map;
         readonly CommandManager _commandManager = new CommandManager();
-        readonly IDictionary<char, Size> _directionTable = new Dictionary<char, Size>()
+        readonly IReadOnlyDictionary<char, Size> _directionTable = new Dictionary<char, Size>()
         {
             { 'w', new Size(0, -1) },
             { 's', new Size(0, 1) },
             { 'a', new Size(-1, 0) },
             { 'd', new Size(1, 0) },
         };
+
+        Map _map;
+
+        /// <summary>
+        /// マップのインスタンスを返します
+        /// </summary>
+        public Map Map => _map;
 
         /// <summary>
         /// Undo 可能な状態かどうかを示します
@@ -45,18 +51,12 @@ namespace Sokoban
         /// <summary>
         /// 操作を Undo します
         /// </summary>
-        public void Undo()
-        {
-            _commandManager.Undo();
-        }
+        public void Undo() { _commandManager.Undo(); }
 
         /// <summary>
         /// Undo を取り消します
         /// </summary>
-        public void Redo()
-        {
-            _commandManager.Redo();
-        }
+        public void Redo() { _commandManager.Redo(); }
 
         /// <summary>
         /// フィールド内の移動を試みます

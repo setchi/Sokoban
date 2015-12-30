@@ -7,14 +7,14 @@ namespace Sokoban
 {
     class MapSerializer
     {
-        readonly IDictionary<FieldTypes, char> _charTable;
-        readonly IDictionary<char, FieldTypes> _fieldTypeTable;
+        readonly IReadOnlyDictionary<FieldTypes, char> _charTable;
+        readonly IReadOnlyDictionary<char, FieldTypes> _fieldTypeTable;
 
         /// <summary>
         /// コンストラクタ
         /// </summary>
         /// <param name="charTable">フィールド種類 -> 文字 のテーブル</param>
-        public MapSerializer(IDictionary<FieldTypes, char> charTable)
+        public MapSerializer(IReadOnlyDictionary<FieldTypes, char> charTable)
         {
             _charTable = charTable;
             _fieldTypeTable = charTable.ToDictionary(

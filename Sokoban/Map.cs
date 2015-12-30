@@ -3,7 +3,7 @@ using System.Drawing;
 
 namespace Sokoban
 {
-    class Map
+    struct Map
     {
         /// <summary>
         /// フィールド上の障害物を表す一次元リスト
@@ -18,7 +18,7 @@ namespace Sokoban
         /// <summary>
         /// ゴール地点の集合
         /// </summary>
-        public HashSet<Point> GoalPositions { get; }
+        public ISet<Point> GoalPositions { get; }
 
         /// <summary>
         /// プレイヤー地点
@@ -32,7 +32,7 @@ namespace Sokoban
         /// <param name="fieldSize"></param>
         /// <param name="playerPositions"></param>
         /// <param name="goalPositions"></param>
-        public Map(IList<FieldTypes> field, Size fieldSize, Point playerPositions, HashSet<Point> goalPositions)
+        public Map(IList<FieldTypes> field, Size fieldSize, Point playerPositions, ISet<Point> goalPositions)
         {
             Field = field;
             FieldSize = fieldSize;

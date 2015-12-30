@@ -31,8 +31,7 @@ namespace Sokoban
                 { FieldTypes.PlayerOnGoal, 'P' },
             });
 
-            var map = mapSerializer.Deserialize(fieldString);
-            var sokoban = new Sokoban(map);
+            var sokoban = new Sokoban(mapSerializer.Deserialize(fieldString));
             var countMove = 0;
 
             Console.WriteLine("倉庫番");
@@ -41,7 +40,7 @@ namespace Sokoban
 
             while (!sokoban.IsClear)
             {
-                Console.WriteLine(mapSerializer.Serialize(map));
+                Console.WriteLine(mapSerializer.Serialize(sokoban.Map));
                 Console.WriteLine("移動回数: " + countMove);
                 Console.WriteLine("移動: (上->w, 左->a, 下->s, 右->d) + Enter");
                 Console.WriteLine("戻る->u, 進む->r, リセット->@, 入力キャンセル->!を含める");
@@ -92,7 +91,7 @@ namespace Sokoban
                 }
             }
 
-            Console.WriteLine(mapSerializer.Serialize(map));
+            Console.WriteLine(mapSerializer.Serialize(sokoban.Map));
             Console.WriteLine("移動回数: " + countMove);
             Console.WriteLine("ゲームクリア！おめでとう！！");
         }
