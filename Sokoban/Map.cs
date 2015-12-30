@@ -6,14 +6,19 @@ namespace Sokoban
     struct Map
     {
         /// <summary>
-        /// フィールド上の障害物を表す一次元リスト
+        /// フィールド上の障害物を表す二次元配列
         /// </summary>
-        public IList<FieldTypes> Field { get; }
+        public FieldTypes[,] Field { get; }
 
         /// <summary>
-        /// フィールドのサイズ
+        /// フィールドの幅
         /// </summary>
-        public Size FieldSize { get; }
+        public int Width => Field.GetLength(0);
+
+        /// <summary>
+        /// フィールドの高さ
+        /// </summary>
+        public int Height => Field.GetLength(1);
 
         /// <summary>
         /// ゴール地点の集合
@@ -29,14 +34,12 @@ namespace Sokoban
         /// コンストラクタ
         /// </summary>
         /// <param name="field"></param>
-        /// <param name="fieldSize"></param>
-        /// <param name="playerPositions"></param>
+        /// <param name="playerPosition"></param>
         /// <param name="goalPositions"></param>
-        public Map(IList<FieldTypes> field, Size fieldSize, Point playerPositions, ISet<Point> goalPositions)
+        public Map(FieldTypes[,] field, Point playerPosition, ISet<Point> goalPositions)
         {
             Field = field;
-            FieldSize = fieldSize;
-            PlayerPosition = playerPositions;
+            PlayerPosition = playerPosition;
             GoalPositions = goalPositions;
         }
 
@@ -47,7 +50,7 @@ namespace Sokoban
         /// <returns></returns>
         public FieldTypes GetField(Point position)
         {
-            return Field[position.Y * FieldSize.Width + position.X];
+            return Field[position.X, position.Y];
         }
 
         /// <summary>
@@ -57,7 +60,7 @@ namespace Sokoban
         /// <param name="type"></param>
         public void SetField(Point position, FieldTypes type)
         {
-            Field[position.Y * FieldSize.Width + position.X] = type;
+            Field[position.X, position.Y] = type;
         }
     }
 }

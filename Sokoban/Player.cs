@@ -4,15 +4,15 @@ using System.Linq;
 
 namespace Sokoban
 {
-    class Sokoban
+    class Player
     {
         readonly CommandManager _commandManager = new CommandManager();
-        readonly IReadOnlyDictionary<char, Size> _directionTable = new Dictionary<char, Size>()
+        readonly IReadOnlyDictionary<CommandTypes, Size> _directionTable = new Dictionary<CommandTypes, Size>()
         {
-            { 'w', new Size(0, -1) },
-            { 's', new Size(0, 1) },
-            { 'a', new Size(-1, 0) },
-            { 'd', new Size(1, 0) },
+            { CommandTypes.MoveUp, new Size(0, -1) },
+            { CommandTypes.MoveDown, new Size(0, 1) },
+            { CommandTypes.MoveLeft, new Size(-1, 0) },
+            { CommandTypes.MoveRight, new Size(1, 0) },
         };
 
         Map _map;
@@ -43,7 +43,7 @@ namespace Sokoban
         /// コンストラクタ
         /// </summary>
         /// <param name="map"></param>
-        public Sokoban(Map map)
+        public Player(Map map)
         {
             _map = map;
         }
@@ -61,16 +61,16 @@ namespace Sokoban
         /// <summary>
         /// フィールド内の移動を試みます
         /// </summary>
-        /// <param name="command"></param>
+        /// <param name="commandType"></param>
         /// <returns>移動に成功したら true</returns>
-        public bool TryMove(char command)
+        public bool TryMove(CommandTypes commandType)
         {
-            if (!_directionTable.ContainsKey(command))
+            if (!_directionTable.ContainsKey(commandType))
             {
                 return false;
             }
 
-            var direction = _directionTable[command];
+            var direction = _directionTable[commandType];
             var nextPosition = _map.PlayerPosition + direction;
             var nextField = _map.GetField(nextPosition);
 

@@ -29,46 +29,7 @@ namespace Sokoban
         /// <returns></returns>
         public Map Deserialize(string fieldString)
         {
-            // 文字列を改行コードで区切ります
-            // 空白文字のみの行は無視します
-            var fieldRows = fieldString
-                .Split(Environment.NewLine.ToCharArray())
-                .Where(row => !string.IsNullOrWhiteSpace(row));
-
-            // フィールドサイズを数えます
-            // 1行目の文字数を Width, 行数を Height とします
-            var fieldSize = new Size(
-                fieldRows.First().Count(),
-                fieldRows.Count());
-
-            // フィールドを表す一次元リストを生成します
-            var field = fieldRows
-                .SelectMany(row => row)
-                .Select(c => _fieldTypeTable[c])
-                .ToList();
-
-            // ゴール地点を抽出します
-            var goalPositions = new HashSet<Point>(field
-                .Select((type, index) => new { type, index })
-                .Where(x => x.type == FieldTypes.Goal)
-                .Select(x => new Point(
-                    x.index % fieldSize.Width,
-                    x.index / fieldSize.Width)));
-
-            // プレイヤー地点を抽出します
-            var playerIndex = field.FindIndex(type => type == FieldTypes.Player);
-            var playerPosition = new Point(
-                playerIndex % fieldSize.Width,
-                playerIndex / fieldSize.Width);
-
-            // フィールドを表すリストでは移動の障害となり得るものだけ管理します
-            // そのためプレイヤー地点とゴール地点はスペースに置き換えます
-            foreach (var pos in goalPositions.Concat(new[] { playerPosition }))
-            {
-                field[pos.Y * fieldSize.Width + pos.X] = FieldTypes.Space;
-            }
-
-            return new Map(field, fieldSize, playerPosition, goalPositions);
+            return InstantiateMap(ParseFieldString(fieldString));
         }
 
         /// <summary>
@@ -78,11 +39,88 @@ namespace Sokoban
         /// <returns></returns>
         public string Serialize(Map map)
         {
-            return new string(Enumerable.Range(0, map.FieldSize.Height)
-                .SelectMany(y => Enumerable.Range(0, map.FieldSize.Width)
-                    .Select(x => _charTable[GetViewFieldType(map, new Point(x, y))])
-                    .Concat(Environment.NewLine.ToCharArray()))
-                .ToArray());
+            return string.Join(string.Empty, Enumerable.Range(0, map.Height)
+                .SelectMany(y => Enumerable.Range(0, map.Width)
+                    .Select(x => GetDisplayFieldType(map, new Point(x, y)))
+                    .Select(fieldType => _charTable[fieldType])
+                    .Concat(Environment.NewLine)));
+        }
+
+        /// <summary>
+        /// 文字列からフィールドの2次元配列を生成します
+        /// </summary>
+        /// <param name="fieldString"></param>
+        /// <returns></returns>
+        FieldTypes[,] ParseFieldString(string fieldString)
+        {
+            // 文字列を改行コードで区切ります
+            // 空白文字のみの行は無視します
+            var fieldRows = fieldString
+                .Split(Environment.NewLine.ToCharArray())
+                .Where(row => !string.IsNullOrWhiteSpace(row));
+
+            if (fieldRows.Count() == 0)
+            {
+                throw new ArgumentException("フィールドが空です");
+            }
+
+            // フィールドサイズを測ります
+            // 行数を Height, 1行目の文字数を Width とします
+            var height = fieldRows.Count();
+            var width = fieldRows.First().Count();
+
+            // すべての行が同じ文字数でなかったらエラー
+            if (!fieldRows.All(row => row.Count() == width))
+            {
+                throw new ArgumentException(
+                    "フィールドの横幅が一律ではありません: "
+                    + Environment.NewLine
+                    + string.Join(Environment.NewLine, fieldRows));
+            }
+
+            // フィールドの2次元配列を作ります
+            var fieldArray = new FieldTypes[width, height];
+            foreach (var y in Enumerable.Range(0, height))
+            {
+                foreach (var x in Enumerable.Range(0, width))
+                {
+                    var character = fieldRows.ElementAt(y).ElementAt(x);
+                    fieldArray[x, y] = _fieldTypeTable[character];
+                }
+            }
+
+            return fieldArray;
+        }
+
+        /// <summary>
+        /// フィールドの2次元配列からマップのインスタンスを生成します
+        /// </summary>
+        /// <param name="fieldArray"></param>
+        /// <returns></returns>
+        Map InstantiateMap(FieldTypes[,] fieldArray)
+        {
+            var toPosition = new Func<int, Point>(i => new Point(
+                i % fieldArray.GetLength(0),
+                i / fieldArray.GetLength(0)));
+
+            // ゴール地点を抽出します
+            var goalPositions = new HashSet<Point>(
+                Enumerable.Range(0, fieldArray.Length).Select(toPosition)
+                    .Where(pos => fieldArray[pos.X, pos.Y] == FieldTypes.Goal));
+
+            // プレイヤー地点を抽出します
+            var playerPosition = Enumerable.Range(0, fieldArray.Length).Select(toPosition)
+                .Where(pos => fieldArray[pos.X, pos.Y] == FieldTypes.Player)
+                .First();
+
+            // マップのフィールド配列では、移動の障害となり得るものだけ管理します
+            // フィールド配列のプレイヤー地点とゴール地点をスペースに置き換えます
+            foreach (var pos in goalPositions.Concat(new[] { playerPosition }))
+            {
+                fieldArray[pos.X, pos.Y] = FieldTypes.Space;
+            }
+
+            return new Map(fieldArray, playerPosition, goalPositions);
         }
 
         /// <summary>
@@ -91,11 +129,11 @@ namespace Sokoban
         /// <param name="map"></param>
         /// <param name="position"></param>
         /// <returns>表示用のフィールド種類</returns>
-        FieldTypes GetViewFieldType(Map map, Point position)
+        FieldTypes GetDisplayFieldType(Map map, Point position)
         {
             var fieldType = position == map.PlayerPosition
                 ? FieldTypes.Player
-                : map.Field[position.Y * map.FieldSize.Width + position.X];
+                : map.GetField(position);
 
             if (map.GoalPositions.Contains(position))
             {

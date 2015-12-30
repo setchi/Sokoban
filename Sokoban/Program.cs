@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 
 namespace Sokoban
 {
@@ -8,8 +6,29 @@ namespace Sokoban
     {
         static void Main(string[] args)
         {
-            var fieldString =
-@"
+            var operationTable = new Dictionary<CommandTypes, Operation>
+            {
+                { CommandTypes.MoveUp, new Operation('w', "上") },
+                { CommandTypes.MoveDown, new Operation('s', "下") },
+                { CommandTypes.MoveLeft, new Operation('a', "左") },
+                { CommandTypes.MoveRight, new Operation('d', "右") },
+                { CommandTypes.Undo, new Operation('u', "戻る") },
+                { CommandTypes.Redo, new Operation('r', "進む") },
+                { CommandTypes.Reset, new Operation('@', "リセット") },
+            };
+
+            var fieldCharTable = new Dictionary<FieldTypes, char>
+            {
+                { FieldTypes.Space, ' ' },
+                { FieldTypes.Wall, '#' },
+                { FieldTypes.Player, 'p' },
+                { FieldTypes.Block, 'o' },
+                { FieldTypes.Goal, '.' },
+                { FieldTypes.BlockOnGoal, 'O' },
+                { FieldTypes.PlayerOnGoal, 'P' },
+            };
+
+            var fieldString = @"
 #########
 #       #
 # ##o## #
@@ -20,80 +39,8 @@ namespace Sokoban
 #########
 ";
 
-            var mapSerializer = new MapSerializer(new Dictionary<FieldTypes, char>
-            {
-                { FieldTypes.Space, ' ' },
-                { FieldTypes.Wall, '#' },
-                { FieldTypes.Player, 'p' },
-                { FieldTypes.Block, 'o' },
-                { FieldTypes.Goal, '.' },
-                { FieldTypes.BlockOnGoal, 'O' },
-                { FieldTypes.PlayerOnGoal, 'P' },
-            });
-
-            var sokoban = new Sokoban(mapSerializer.Deserialize(fieldString));
-            var countMove = 0;
-
-            Console.WriteLine("倉庫番");
-            Console.WriteLine("Please Enter Key... Game Start");
-            Console.ReadLine();
-
-            while (!sokoban.IsClear)
-            {
-                Console.WriteLine(mapSerializer.Serialize(sokoban.Map));
-                Console.WriteLine("移動回数: " + countMove);
-                Console.WriteLine("移動: (上->w, 左->a, 下->s, 右->d) + Enter");
-                Console.WriteLine("戻る->u, 進む->r, リセット->@, 入力キャンセル->!を含める");
-
-                var input = Console.ReadLine();
-
-                if (input.Length == 0)
-                {
-                    continue;
-                }
-
-                if (input.Contains('!'))
-                {
-                    // Cancel
-                    continue;
-                }
-
-                var command = input[0];
-
-                if (command == 'u' && sokoban.CanUndo)
-                {
-                    sokoban.Undo();
-                    countMove--;
-                    continue;
-                }
-
-                if (command == 'r' && sokoban.CanRedo)
-                {
-                    sokoban.Redo();
-                    countMove++;
-                    continue;
-                }
-
-                if (command == '@')
-                {
-                    while (sokoban.CanUndo)
-                    {
-                        sokoban.Undo();
-                    }
-
-                    countMove = 0;
-                    continue;
-                }
-
-                if (sokoban.TryMove(command))
-                {
-                    countMove++;
-                }
-            }
-
-            Console.WriteLine(mapSerializer.Serialize(sokoban.Map));
-            Console.WriteLine("移動回数: " + countMove);
-            Console.WriteLine("ゲームクリア！おめでとう！！");
+            new Game(operationTable, fieldCharTable)
+                .Start(fieldString);
         }
     }
 }
