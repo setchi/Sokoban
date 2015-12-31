@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
 
 namespace Sokoban
 {
@@ -31,13 +30,6 @@ namespace Sokoban
         /// Redo 可能な状態かどうかを示します
         /// </summary>
         public bool CanRedo => _commandManager.CanRedo;
-
-        /// <summary>
-        /// クリア状態かどうかを示します
-        /// </summary>
-        public bool IsClear => _map.GoalPositions
-            .Select(_map.GetField)
-            .All(type => type == FieldTypes.Block);
 
         /// <summary>
         /// コンストラクタ

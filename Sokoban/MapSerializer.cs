@@ -39,8 +39,8 @@ namespace Sokoban
         /// <returns></returns>
         public string Serialize(Map map)
         {
-            return string.Join(string.Empty, Enumerable.Range(0, map.Height)
-                .SelectMany(y => Enumerable.Range(0, map.Width)
+            return string.Join(string.Empty, Enumerable.Range(0, map.FieldHeight)
+                .SelectMany(y => Enumerable.Range(0, map.FieldWidth)
                     .Select(x => GetDisplayFieldType(map, new Point(x, y)))
                     .Select(fieldType => _charTable[fieldType])
                     .Concat(Environment.NewLine)));

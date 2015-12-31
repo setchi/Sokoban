@@ -13,12 +13,12 @@ namespace Sokoban
         /// <summary>
         /// フィールドの幅
         /// </summary>
-        public int Width => Field.GetLength(0);
+        public int FieldWidth => Field.GetLength(0);
 
         /// <summary>
         /// フィールドの高さ
         /// </summary>
-        public int Height => Field.GetLength(1);
+        public int FieldHeight => Field.GetLength(1);
 
         /// <summary>
         /// ゴール地点の集合

@@ -41,13 +41,13 @@ namespace Sokoban
             Console.WriteLine("Please Enter Key... Game Start");
             Console.ReadLine();
 
-            var commandDescription = CreateOperationDescription();
+            var operationManualText = GenerateOperationManualText();
 
-            while (!player.IsClear)
+            while (!IsClaer(player.Map))
             {
                 Console.WriteLine(mapSerializer.Serialize(player.Map));
                 Console.WriteLine($"移動回数: {countMove}");
-                Console.WriteLine(commandDescription);
+                Console.WriteLine(operationManualText);
 
                 var input = Console.ReadLine();
 
@@ -113,15 +113,27 @@ namespace Sokoban
         }
 
         /// <summary>
-        /// 操作説明用の文字列を作ります
+        /// マップがクリア状態か判定します
+        /// </summary>
+        /// <param name="map"></param>
+        /// <returns></returns>
+        bool IsClaer(Map map)
+        {
+            // ゴール地点が全て Block だったらクリアとみなします
+            return map.GoalPositions.Select(map.GetField)
+                .All(type => type == FieldTypes.Block);
+        }
+
+        /// <summary>
+        /// 操作説明用の文字列を生成します
         /// </summary>
         /// <returns></returns>
-        string CreateOperationDescription()
+        string GenerateOperationManualText()
         {
             var sb = new StringBuilder();
 
             sb.Append("移動: (");
-            sb.Append(CreateCommandDescriptions(
+            sb.Append(GenerateOperationCommandText(
                 CommandTypes.MoveUp,
                 CommandTypes.MoveLeft,
                 CommandTypes.MoveDown,
@@ -129,7 +141,7 @@ namespace Sokoban
             sb.Append(") + Enter");
 
             sb.Append(Environment.NewLine);
-            sb.Append(CreateCommandDescriptions(
+            sb.Append(GenerateOperationCommandText(
                 CommandTypes.Undo,
                 CommandTypes.Redo,
                 CommandTypes.Reset));
@@ -139,15 +151,15 @@ namespace Sokoban
         }
 
         /// <summary>
-        /// コマンド説明用の文字列を作ります
+        /// 操作とコマンドを紐づけた文字列を生成します
         /// </summary>
         /// <param name="commandTypes"></param>
         /// <returns></returns>
-        string CreateCommandDescriptions(params CommandTypes[] commandTypes)
+        string GenerateOperationCommandText(params CommandTypes[] commandTypes)
         {
             return string.Join(", ", commandTypes
                 .Where(_operationTable.ContainsKey)
-                .Select(type => _operationTable[type])
+                .Select(commandType => _operationTable[commandType])
                 .Select(operation => $"{operation.Name}->{operation.Command}"));
         }
     }
