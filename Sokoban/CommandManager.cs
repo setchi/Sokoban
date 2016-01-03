@@ -5,8 +5,8 @@ namespace Sokoban
 {
     class CommandManager
     {
-        Stack<Command> _undoStack = new Stack<Command>();
-        Stack<Command> _redoStack = new Stack<Command>();
+        readonly Stack<Command> _undoStack = new Stack<Command>();
+        readonly Stack<Command> _redoStack = new Stack<Command>();
 
         /// <summary>
         /// Undo 可能な状態かどうかを示します
